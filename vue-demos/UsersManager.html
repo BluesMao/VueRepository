@@ -8,7 +8,6 @@
     <script src="scripts/js/jquery-3.2.1.min.js"></script>
     <script src="scripts/js/bootstrap.min.js"></script>
     <script src="scripts/js/vue.js"></script>
-
     <script>
         window.onload = function () {
             var app = new Vue({
@@ -16,7 +15,8 @@
                 data: {
                     elements: [],
                     username: '',
-                    department: ''
+                    department: '',
+                    nowIndex: -2
                 },
                 methods: {
                     Save: function () {
@@ -24,6 +24,15 @@
                             name: this.username,
                             depart: this.department
                         });
+                        this.username = '';
+                        this.department = '';
+                    },
+                    ConfirmDel: function (n) {
+                        if (n == -2) {
+                            this.elements = [];
+                        } else {
+                            this.elements.splice(n, 1);
+                        }
                     }
                 }
             });
@@ -32,62 +41,76 @@
 </head>
 
 <body>
-    <div id="demo">
-        <div class="form-group">
-            <label for="username">姓名：</label>
-            <input id="username" type="text" class="form-control" placeholder="请输入姓名" v-model="username" />
-            <label for="department">部门：</label>
-            <input id="department" type="text" class="form-control" placeholder="请输入部门" v-model="department" />
-        </div>
+    <div id="demo" class="container">
+        <form role="form" v-on:submit.prevent>
+            <div class="form-group">
+                <label for="username">姓名：</label>
+                <input id="username" type="text" class="form-control" placeholder="请输入姓名" v-model="username" />
+                <label for="department">部门：</label>
+                <input id="department" type="text" class="form-control" placeholder="请输入部门" v-model="department" />
+            </div>
+            <div class="form-group">
+                <div>
+                    <button id="btnSave" class="btn btn-primary" v-on:click="Save()">添加</button>
+                    <button id="btnReset" type="reset" class="btn btn-danger">重置</button>
+                </div>
+            </div>
+        </form>
+        <hr>
         <div>
-            <button id="btnSave" class="btn btn-primary" v-on:click="Save()">保 存</button>
-        </div>
-        <div>
-            <table class="table-bordered">
-                <caption>
-                    <h3>用户信息列表</h3>
+            <table class="table table-bordered table-hover">
+                <caption class="h3 text-info">
+                    用户信息列表
                 </caption>
                 <thead>
-                    <tr>
-                        <th style="width:200px">
+                    <tr class="text-danger">
+                        <th class="text-center">序号</th>
+                        <th class="text-center">
                             姓名
                         </th>
-                        <th style="width:200px">
+                        <th class="text-center">
                             部门
                         </th>
-                        <th style="width:200px">
+                        <th class="text-center">
                             操作
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in elements">
+                    <tr v-for="(item, index) in elements" class="text-center">
+                        <td>{{ index + 1}}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.depart }}</td>
-                        <td><button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal">删除</button></td>
+                        <td><button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#myModal" v-on:click="nowIndex=index">删除</button></td>
+                    </tr>
+                    <tr v-show="elements.length == 0 ? true : false">
+                        <td colspan="4" class="text-center">
+                            <h5>暂无数据....</h5>
+                        </td>
+                    </tr>
+                    <tr v-show="elements.length == 0 ? false : true">
+                        <td colspan="4" class="text-center"><button id="btn_all" v-on:click="nowIndex=-2" class="btn btn-danger" data-toggle="modal" data-target="#myModal">删除全部</button></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div v-show="elements.length == 0 ? true : false">
-            <h5>暂无数据....</h5>
-        </div>
-        <div v-show="elements.length == 0 ? false : true"><button id="btn_all" class="btn btn-danger" data-toggle="modal" data-target="#myModal">删除全部</button></div>
 
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div data-index="{{nowIndex}}" class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         <h4 class="modal-title" id="myModalLabel">确认删除嘛？</h4>
                     </div>
-                    <div class="modal-body">在这里添加一些文本</div>
+                    <div class="modal-body">您将删除记录：</div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">确认</button>
+                        <button type="button" class="btn btn-primary" @click="ConfirmDel(nowIndex)" data-dismiss="modal">确认</button>
                     </div>
                 </div>
             </div>
         </div>
 </body>
+
 </html>
