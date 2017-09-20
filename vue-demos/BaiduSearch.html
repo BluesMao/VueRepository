@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Vue实例之百度搜索</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="scripts/css/bootstrap.min.css">
+    <script src="scripts/js/jquery-3.2.1.min.js"></script>
+    <script src="scripts/js/bootstrap.min.js"></script>
+    <script src="scripts/js/vue.js"></script>
+    <script src="scripts/js/vue-resource.min.js"></script>
+    <script>
+        window.onload = function () {
+            var app = new Vue({
+                el: "#demo",
+                data: {
+                    keyWord: '',
+                    result: []
+                },
+                methods: {
+                    Search: function () {
+                        this.$http.jsonp('https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su',{ wd : this.keyWord }, { json:'1' }).then(function (response) {
+                            alert(response.status);
+                        },function(error){
+                            alert(error.status);
+                        });
+                    }
+                }
+            });
+        };
+    </script>
+</head>
+
+<body>
+    <div id="demo" class="container">
+        <hr>
+        <div class="form-group">
+            <input type="text" id="txtKey" v-model="keyWord" v-on:keydown="Search()" class="form-control pull-left" />
+        </div>
+    </div>
+</body>
+
+</html>
